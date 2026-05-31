@@ -1,0 +1,24 @@
+name: Auto-merge owner PRs
+
+# Reusable workflow — enables auto-merge (squash) when the PR author matches
+# the configured owner login. The actual merge fires once required checks pass.
+on:
+  workflow_call:
+    inputs:
+      owner_login:
+        description: 'GitHub username whose PRs should be auto-merged'
+        type: string
+        required: true
+
+jobs:
+  auto-merge:
+    if: github.event.pull_request.user.login == inputs.owner_login
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Enable auto-merge (squash)
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
