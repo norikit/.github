@@ -29,6 +29,7 @@ for enthusiasts.
 
 | | Project | What it is | Status |
 |:--:|---|---|---|
+| <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noricore-dark.svg"><img src="assets/noricore-light.svg" alt="" width="100"></picture> | [**noricore**](https://github.com/norikit/noricore) | Event broker and data backbone — aggregates system state and serves it to every tool. | 🌱 Early design phase |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noribar-dark.svg"><img src="assets/noribar-light.svg" alt="" width="100"></picture> | [**noribar**](https://github.com/norikit/noribar) | Menu-bar replacement built around native, fully-animated SF Symbols. Swift + AppKit + embedded Lua. | 🚧 In progress |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noriglaze-dark.svg"><img src="assets/noriglaze-light.svg" alt="" width="100"></picture> | [**noriglaze**](https://github.com/norikit/noriglaze) | Theme manager — one switch retheme every norikit tool at once. | 🌱 Early design phase |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noribento-dark.svg"><img src="assets/noribento-light.svg" alt="" width="100"></picture> | [**noribento**](https://github.com/norikit/noribento) | Fast, keyboard-driven tiling window manager, i3-style. | 🌱 Early design phase |
