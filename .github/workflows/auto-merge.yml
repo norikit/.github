@@ -1,17 +1,47 @@
-name: Auto-merge (reusable)
+name: Claude review & auto-merge (reusable)
 
-# Reusable — unconditional. The caller is responsible for gating on PR author.
+# Reviews the PR with Claude first. Auto-merge is only enabled if Claude
+# finds no significant issues. The caller is responsible for gating on
+# PR author before invoking this.
 on:
   workflow_call:
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: true
 
 jobs:
-  auto-merge:
+  review-and-merge:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       contents: write
+      pull-requests: write
+      issues: write
     steps:
-      - name: Enable auto-merge (squash)
+      - name: Review PR with Claude
+        id: review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request for the norikit macOS desktop-customization ecosystem.
+
+            Check for:
+            - Correctness bugs or logic errors
+            - Security vulnerabilities
+            - Performance regressions (idle CPU near zero is a hard requirement)
+            - norikit prime directive violations: native-first (no shell-script glue, no web
+              views), prefer noricore IPC over shell spawning for cross-tool communication,
+              one tool one job, customization must not require forking
+
+            Post a concise review comment with your findings.
+
+            Set `approved` to true only if there are no significant issues worth discussing
+            before this merges. Minor style nits do not block approval.
+          claude_args: >-
+            --json-schema {"type":"object","required":["approved","summary"],"properties":{"approved":{"type":"boolean"},"summary":{"type":"string"}}}
+
+      - name: Enable auto-merge if approved
+        if: fromJSON(steps.review.outputs.structured_output).approved == true
         run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
