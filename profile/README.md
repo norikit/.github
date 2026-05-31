@@ -36,6 +36,7 @@ for enthusiasts.
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/norify-dark.svg"><img src="assets/norify-light.svg" alt="" width="100"></picture> | [**norify**](https://github.com/norikit/norify) | Notification engine for the ecosystem. | 🌱 Early design phase |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noricut-dark.svg"><img src="assets/noricut-light.svg" alt="" width="100"></picture> | [**noricut**](https://github.com/norikit/noricut) | _Purpose taking shape._ | 🌱 Early design phase |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noripad-dark.svg"><img src="assets/noripad-light.svg" alt="" width="100"></picture> | **noripad** | Clipboard manager — searchable history with pinning and quick paste. | 🥚 Planned |
+| | **noripaper** | Wallpaper engine — static and animated wallpapers, hot-swapped on theme change. | 🥚 Planned |
 | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/noriset-dark.svg"><img src="assets/noriset-light.svg" alt="" width="100"></picture> | **noriset** | The bundler — combines all norikit tooling into one plug-and-play package. | 🥚 Planned |
 
 Every project is open source under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).
