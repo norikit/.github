@@ -1,0 +1,73 @@
+name: Swift CI
+
+# Reusable workflow — call from any norikit Swift project.
+# When a project switches to a different language, call the appropriate
+# language-specific workflow from .github instead (e.g. rust-ci.yml).
+on:
+  workflow_call:
+    inputs:
+      lua:
+        description: 'Lint Lua config files (luacheck + stylua --check)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  swift:
+    name: Build & test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Toolchain versions
+        run: swift --version && xcodebuild -version
+
+      - name: SwiftLint
+        run: |
+          if [ -f .swiftlint.yml ] && command -v swiftlint >/dev/null 2>&1; then
+            swiftlint --strict
+          else
+            echo "::notice::SwiftLint skipped (no .swiftlint.yml or swiftlint not installed)"
+          fi
+
+      - name: Build & test
+        run: |
+          if [ -f Package.swift ]; then
+            swift build --build-tests && swift test
+          else
+            echo "::notice::No Package.swift yet — build & test step inactive."
+          fi
+
+  lua:
+    name: Lint Lua
+    if: inputs.lua
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Detect Lua files
+        id: detect
+        run: |
+          if git ls-files '*.lua' | grep -q .; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No .lua files tracked — Lua lint inactive."
+          fi
+
+      - name: Install luacheck + stylua
+        if: steps.detect.outputs.found == 'true'
+        run: brew install luacheck stylua
+
+      - name: luacheck
+        if: steps.detect.outputs.found == 'true'
+        run: git ls-files '*.lua' -z | xargs -0 luacheck
+
+      - name: stylua --check
+        if: steps.detect.outputs.found == 'true'
+        run: git ls-files '*.lua' -z | xargs -0 stylua --check
