@@ -1,18 +1,11 @@
-name: Auto-merge owner PRs
+name: Auto-merge (reusable)
 
-# Reusable workflow — enables auto-merge (squash) when the PR author matches
-# the configured owner login. The actual merge fires once required checks pass.
+# Reusable — unconditional. The caller is responsible for gating on PR author.
 on:
   workflow_call:
-    inputs:
-      owner_login:
-        description: 'GitHub username whose PRs should be auto-merged'
-        type: string
-        required: true
 
 jobs:
   auto-merge:
-    if: github.event.pull_request.user.login == inputs.owner_login
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
