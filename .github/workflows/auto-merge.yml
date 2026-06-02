@@ -12,6 +12,9 @@ on:
 jobs:
   review-and-merge:
     runs-on: ubuntu-latest
+    # Hard ceiling: a review must never run unbounded (claude_code preset has
+    # full tool access; without this it can loop until the 6h job cap).
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
@@ -44,7 +47,10 @@ jobs:
 
             Set `approved` to true only if there are no significant issues worth discussing
             before this merges. Minor style nits do not block approval.
+          # --max-turns bounds agentic exploration so a review converges instead
+          # of wandering the repo; the job timeout above is the hard backstop.
           claude_args: >-
+            --max-turns 30
             --json-schema {"type":"object","required":["approved","summary"],"properties":{"approved":{"type":"boolean"},"summary":{"type":"string"}}}
 
       - name: Enable auto-merge if approved
