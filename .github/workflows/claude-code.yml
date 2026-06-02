@@ -14,6 +14,9 @@ jobs:
       pull-requests: write
       issues: write
     steps:
+      # The action restores trusted config from origin/main, so the workspace
+      # must be a git checkout (otherwise: "fatal: not a git repository").
+      - uses: actions/checkout@v4
       - name: Claude Code
         uses: anthropics/claude-code-action@v1
         with:
