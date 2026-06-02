@@ -28,6 +28,9 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # TEMP DEBUG (revert): surface the SDK turns so we can see why the
+          # review fails to converge on trivial diffs.
+          show_full_output: true
           # Pass the job's GITHUB_TOKEN so the action skips the OIDC token
           # exchange (which needs `id-token: write` — a reusable workflow can't
           # get it unless every caller also grants the permission).
@@ -50,7 +53,7 @@ jobs:
           # --max-turns bounds agentic exploration so a review converges instead
           # of wandering the repo; the job timeout above is the hard backstop.
           claude_args: >-
-            --max-turns 30
+            --max-turns 8
             --json-schema {"type":"object","required":["approved","summary"],"properties":{"approved":{"type":"boolean"},"summary":{"type":"string"}}}
 
       - name: Enable auto-merge if approved
