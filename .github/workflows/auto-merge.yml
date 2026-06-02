@@ -22,6 +22,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Pass the job's GITHUB_TOKEN so the action skips the OIDC token
+          # exchange (which needs `id-token: write` — a reusable workflow can't
+          # get it unless every caller also grants the permission).
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             Review this pull request for the norikit macOS desktop-customization ecosystem.
 
