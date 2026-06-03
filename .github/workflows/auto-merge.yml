@@ -1,63 +1,26 @@
 name: Claude review & auto-merge (reusable)
 
-# Reviews the PR with Claude first. Auto-merge is only enabled if Claude
-# finds no significant issues. The caller is responsible for gating on
-# PR author before invoking this.
+# ⚠️ AI REVIEW IS CURRENTLY DISABLED.
+#
+# anthropics/claude-code-action@v1 stalls at invocation: the `claude` process
+# spawns and emits zero output until the job timeout cancels it (no turns ever
+# run, so --max-turns has no effect). Captured via show_full_output on
+# norikit/noribar#20 — see the tracking issue. Until that's fixed (pin the
+# action/CLI to a known-good version), this reusable is a no-op so it can never
+# hang or block a PR. Auto-merge is intentionally NOT performed — merge by hand.
+#
+# To re-enable: restore the `anthropics/claude-code-action@v1` review step plus
+# the "Enable auto-merge if approved" step from git history (and pin a version).
+
 on:
   workflow_call:
     secrets:
       ANTHROPIC_API_KEY:
-        required: true
+        required: false
 
 jobs:
   review-and-merge:
     runs-on: ubuntu-latest
-    # Hard ceiling: a review must never run unbounded (claude_code preset has
-    # full tool access; without this it can loop until the 6h job cap).
-    timeout-minutes: 10
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
     steps:
-      # The action restores trusted config from origin/main, so the workspace
-      # must be a git checkout (otherwise: "fatal: not a git repository").
-      - uses: actions/checkout@v4
-      - name: Review PR with Claude
-        id: review
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # TEMP DEBUG (revert): surface the SDK turns so we can see why the
-          # review fails to converge on trivial diffs.
-          show_full_output: true
-          # Pass the job's GITHUB_TOKEN so the action skips the OIDC token
-          # exchange (which needs `id-token: write` — a reusable workflow can't
-          # get it unless every caller also grants the permission).
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          prompt: |
-            Review this pull request for the norikit macOS desktop-customization ecosystem.
-
-            Check for:
-            - Correctness bugs or logic errors
-            - Security vulnerabilities
-            - Performance regressions (idle CPU near zero is a hard requirement)
-            - norikit prime directive violations: native-first (no shell-script glue, no web
-              views), prefer noricore IPC over shell spawning for cross-tool communication,
-              one tool one job, customization must not require forking
-
-            Post a concise review comment with your findings.
-
-            Set `approved` to true only if there are no significant issues worth discussing
-            before this merges. Minor style nits do not block approval.
-          # --max-turns bounds agentic exploration so a review converges instead
-          # of wandering the repo; the job timeout above is the hard backstop.
-          claude_args: >-
-            --max-turns 8
-            --json-schema {"type":"object","required":["approved","summary"],"properties":{"approved":{"type":"boolean"},"summary":{"type":"string"}}}
-
-      - name: Enable auto-merge if approved
-        if: fromJSON(steps.review.outputs.structured_output).approved == true
-        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: AI review disabled
+        run: echo "::notice::AI review is disabled (claude-code-action invocation stall). Merge manually."
